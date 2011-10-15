@@ -19,7 +19,7 @@ function usage ()
 if [ "${HOSTNAME}" = 'kortirion' ]; then
 	DROPBOXDIR='/mnt/documents/Dropbox/crypt'
 elif [ "${HOSTNAME}" = 'driftavalii' ]; then
-	DROPBOXDIR="~/Dropbox/crypt"
+	DROPBOXDIR="${HOME}/Dropbox/crypt"
 else
 	echo "Host unknown"
 	exit 1
