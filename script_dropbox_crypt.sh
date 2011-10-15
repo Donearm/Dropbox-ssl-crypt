@@ -28,10 +28,18 @@ fi
 
 if [ "$1" = 'crypt' ]; then
 	$SSLENC -in "${2}" -out ${DROPBOXDIR}/$(basename "${2}".enc)
-	echo "File encrypted!"
+	if [ $? -eq 1 ]; then
+		exit 1
+	else
+		echo "File encrypted!"
+	fi
 elif [ "$1" = 'decrypt' ]; then
 	$SSLDEC -in "${2}" -out $(basename "${2%%.enc}")
-	echo "File decrypted to current directory"
+	if [ $? -eq 1 ]; then
+		exit 1
+	else
+		echo "File decrypted to current directory"
+	fi
 else
 	usage
 	exit 1
