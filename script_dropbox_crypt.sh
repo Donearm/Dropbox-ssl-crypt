@@ -7,13 +7,53 @@
 SSLENC="openssl aes-256-cbc -salt -a"
 SSLDEC="openssl aes-256-cbc -d -a"
 HOSTNAME=$(uname -n)
+# flags
+DECRYPT=0
+CRYPT=0
+ERASE=0
 
 function usage ()
 {
 	echo "Usage:"
-	echo "script_dropbox_crypt.sh [crypt|decrypt] file"
+	echo "script_dropbox_crypt.sh -d|-c [-e] file(s)"
 	echo ""
 }	
+
+function cryptfiles()
+{
+	for file in "$@"; do
+		echo "Encrypting $file ..."
+		$SSLENC -in $file -out ${DROPBOXDIR}/$(basename "$file".enc)
+		if [ $? -eq 1 ]; then
+			exit 1
+		else
+			if [[ $ERASE -gt 0 ]]; then
+				rm "$file"
+				echo "File encrypted!"
+			else
+				echo "File encrypted!"
+			fi
+		fi
+	done
+}
+
+function decryptfiles()
+{
+	for file in "$@"; do
+		echo "Decrypting $file ..."
+		$SSLDEC -in "$file" -out $(basename "${file%%.enc}")
+		if [ $? -eq 1 ]; then
+			exit 1
+		else
+			if [[ $ERASE -gt 0 ]]; then
+				rm "$file"
+				echo "File decrypted!"
+			else
+				echo "File decrypted!"
+			fi
+		fi
+	done
+}
 
 # check whether we are on laptop or desktop
 if [ "${HOSTNAME}" = 'kortirion' ]; then
@@ -25,21 +65,22 @@ else
 	exit 1
 fi
 
+while getopts cde opt; do
+	case "$opt" in
+		c) CRYPT=1;; # crypting mode
+		d) DECRYPT=1;; # decrypting mode
+		e) ERASE=1;; # erase the input files after successful de/encryption
+		*) usage;;
+	esac
+done
 
-if [ "$1" = 'crypt' ]; then
-	$SSLENC -in "${2}" -out ${DROPBOXDIR}/$(basename "${2}".enc)
-	if [ $? -eq 1 ]; then
-		exit 1
-	else
-		echo "File encrypted!"
-	fi
-elif [ "$1" = 'decrypt' ]; then
-	$SSLDEC -in "${2}" -out $(basename "${2%%.enc}")
-	if [ $? -eq 1 ]; then
-		exit 1
-	else
-		echo "File decrypted to current directory"
-	fi
+# remove all arguments but for the very last one (should be the file)
+shift $(( OPTIND -1 ))
+
+if [[ $CRYPT -gt 0 ]]; then
+	cryptfiles "$@"
+elif [[ $DECRYPT -gt 0 ]]; then
+	decryptfiles "$@"
 else
 	usage
 	exit 1
