@@ -3,6 +3,8 @@
 # crypt/decrypt a file from/to a private Dropbox subdirectory using 
 # openssl
 
+DROPBOXDIR='/mnt/documents/Dropbox/crypt'
+
 # openssl aliases
 SSLENC="openssl aes-256-cbc -salt -a"
 SSLDEC="openssl aes-256-cbc -d -a"
@@ -55,15 +57,6 @@ function decryptfiles()
 	done
 }
 
-# check whether we are on laptop or desktop
-if [ "${HOSTNAME}" = 'kortirion' ]; then
-	DROPBOXDIR='/mnt/documents/Dropbox/crypt'
-elif [ "${HOSTNAME}" = 'driftavalii' ]; then
-	DROPBOXDIR="${HOME}/Dropbox/crypt"
-else
-	echo "Host unknown"
-	exit 1
-fi
 
 while getopts cde opt; do
 	case "$opt" in
