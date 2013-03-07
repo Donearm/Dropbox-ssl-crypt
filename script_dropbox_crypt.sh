@@ -3,7 +3,7 @@
 # crypt/decrypt a file from/to a private Dropbox subdirectory using 
 # openssl
 
-DROPBOXDIR='/mnt/documents/Dropbox/crypt'
+DROPBOXDIR='/mnt/d/Dropbox/crypt'
 
 # openssl aliases
 SSLENC="openssl aes-256-cbc -salt -a"
